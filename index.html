@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tính tiền taxi Xanh SM</title>
+<title>Tính giá taxi Xanh SM</title>
 
 <style>
 :root{
@@ -11,58 +11,35 @@
   --accent:#00b14f;
   --bg:#f5f7fa;
 }
-body{
-  font-family:system-ui;
-  background:var(--bg);
-  margin:0;
-  padding:16px;
-}
+body{font-family:system-ui;background:var(--bg);margin:0;padding:16px}
 .container{max-width:520px;margin:auto}
 .card{
-  background:#fff;
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:12px;
+  background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;
   box-shadow:0 6px 18px rgba(0,0,0,0.06)
 }
 .title{font-weight:700;font-size:18px;margin-bottom:10px}
 label{font-weight:600;display:block;margin:6px 0}
 input,select{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #e5e7eb;
-  margin-bottom:10px;
+  width:100%;padding:10px;border-radius:10px;
+  border:1px solid #e5e7eb;margin-bottom:10px;
 }
 button{
-  width:100%;
-  padding:12px;
-  border:0;
-  border-radius:10px;
-  font-weight:700;
-  color:#fff;
-  background:var(--primary);
-  cursor:pointer;
+  width:100%;padding:12px;border:0;border-radius:10px;
+  font-weight:700;color:#fff;background:var(--primary);cursor:pointer;
 }
 .btn-green{background:var(--accent)}
 .row{display:flex;gap:10px}
 .hidden{display:none}
 .line{
-  display:flex;
-  justify-content:space-between;
-  padding:6px 0;
-  border-bottom:1px dashed #eee
+  display:flex;justify-content:space-between;
+  padding:6px 0;border-bottom:1px dashed #eee
 }
 .total{
-  font-size:20px;
-  font-weight:900;
-  text-align:right;
-  margin-top:10px;
-  color:#e11d48
+  font-size:22px;font-weight:900;text-align:right;
+  margin-top:10px;color:#e11d48
 }
-.call{
-  background:#ff3b30
-}
+.call{background:#ff3b30}
+.note{color:#16a34a;font-weight:600;margin-top:8px}
 </style>
 </head>
 
@@ -79,8 +56,12 @@ button{
   <option value="minio">Xanh Minio</option>
 </select>
 
-<label>Quãng đường (km)</label>
+<label>Quãng đường đi (km)</label>
 <input id="km" type="number" value="10">
+
+<label>
+<input type="checkbox" id="returnTrip"> Có khách chiều về (GIẢM 60%)
+</label>
 
 <label>Thời gian chờ (phút)</label>
 <input id="wait" type="number" value="0">
@@ -97,6 +78,7 @@ button{
 <div id="result" class="hidden">
 <div id="detail"></div>
 <div id="total" class="total"></div>
+<div id="saving" class="note"></div>
 </div>
 <div id="empty">Nhập dữ liệu để tính...</div>
 </div>
@@ -119,39 +101,51 @@ const PRICE = {
 const WAIT_PRICE = 2000;
 const NIGHT_EXTRA = 0;
 
-// ===== TÍNH =====
+// ===== TÍNH KM =====
+function calcDistanceCost(km, p){
+  let remain = Math.max(0, km-2);
+
+  const km1 = Math.min(10, remain);
+  remain -= km1;
+
+  const km2 = Math.min(13, remain);
+  remain -= km2;
+
+  const km3 = remain;
+
+  return (km>0?p.open:0) + km1*p.p1 + km2*p.p2 + km3*p.p3;
+}
+
+// ===== MAIN =====
 function calc(){
   const km = parseFloat(document.getElementById('km').value)||0;
   const wait = parseFloat(document.getElementById('wait').value)||0;
   const night = document.getElementById('night').checked;
+  const returnTrip = document.getElementById('returnTrip').checked;
   const type = document.getElementById('carType').value;
 
-  if(km<=0){
-    alert("Nhập km đi bro!");
-    return;
-  }
+  if(km<=0){ alert("Nhập km!"); return; }
 
   const p = PRICE[type];
 
-  let remain = Math.max(0, km-2);
+  // chiều đi
+  const goCost = calcDistanceCost(km, p);
 
-  const km1 = Math.min(10, remain); // 2-12
-  remain -= km1;
+  // chiều về
+  let backFull = 0;
+  let backDiscount = 0;
+  let backFinal = 0;
 
-  const km2 = Math.min(13, remain); // 12-25
-  remain -= km2;
-
-  const km3 = remain; // >25
-
-  const v_open = p.open;
-  const v1 = km1 * p.p1;
-  const v2 = km2 * p.p2;
-  const v3 = km3 * p.p3;
+  if(returnTrip){
+    backFull = calcDistanceCost(km, p);   // giá gốc
+    backDiscount = backFull * 0.6;        // giảm 60%
+    backFinal = backFull * 0.4;           // còn 40%
+  }
 
   const waitCharge = wait>4 ? (wait-4)*WAIT_PRICE : 0;
   const nightFee = night ? NIGHT_EXTRA : 0;
 
-  const total = v_open + v1 + v2 + v3 + waitCharge + nightFee;
+  const total = goCost + backFinal + waitCharge + nightFee;
 
   // render
   document.getElementById('empty').style.display='none';
@@ -164,24 +158,36 @@ function calc(){
     d.innerHTML += `<div class="line"><span>${t}</span><span>${v.toLocaleString()} đ</span></div>`;
   }
 
-  line("Mở cửa", v_open);
-  line("Km 2–12 ("+km1+" km)", v1);
-  line("Km 12–25 ("+km2+" km)", v2);
-  line("Km >25 ("+km3+" km)", v3);
-  line("Chờ ("+(wait>4?wait-4:0)+" phút)", waitCharge);
-  line("Phụ phí đêm", nightFee);
+  line("🚗 Chiều đi", goCost);
 
-  document.getElementById('total').innerText = "👉 Tổng: "+ total.toLocaleString() + " đ";
+  if(returnTrip){
+    line("🔁 Giá gốc chiều về", backFull);
+    line("💸 Giảm 60%", -backDiscount);
+    line("👉 Khách trả chiều về", backFinal);
+  }
+
+  line("⏱ Chờ ("+(wait>4?wait-4:0)+" phút)", waitCharge);
+  line("🌙 Phụ phí đêm", nightFee);
+
+  document.getElementById('total').innerText =
+    "👉 Tổng tiền: "+ total.toLocaleString() + " đ";
+
+  if(returnTrip){
+    document.getElementById('saving').innerText =
+      "💰 Khách tiết kiệm: " + backDiscount.toLocaleString() + " đ";
+  } else {
+    document.getElementById('saving').innerText = "";
+  }
 }
 
 // ===== CALL =====
 function callNow(){
-  window.location.href = "tel:0900000000"; // đổi số
+  window.location.href = "tel:0900000000";
 }
 
 // ===== ZALO =====
 function zaloNow(){
-  window.location.href = "https://zalo.me/0900000000"; // đổi số
+  window.location.href = "https://zalo.me/0900000000";
 }
 </script>
 
