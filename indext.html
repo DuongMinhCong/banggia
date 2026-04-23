@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tính tiền taxi Xanh SM</title>
+
+<style>
+:root{
+  --primary:#2d7df4;
+  --accent:#00b14f;
+  --bg:#f5f7fa;
+}
+body{
+  font-family:system-ui;
+  background:var(--bg);
+  margin:0;
+  padding:16px;
+}
+.container{max-width:520px;margin:auto}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.06)
+}
+.title{font-weight:700;font-size:18px;margin-bottom:10px}
+label{font-weight:600;display:block;margin:6px 0}
+input,select{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  margin-bottom:10px;
+}
+button{
+  width:100%;
+  padding:12px;
+  border:0;
+  border-radius:10px;
+  font-weight:700;
+  color:#fff;
+  background:var(--primary);
+  cursor:pointer;
+}
+.btn-green{background:var(--accent)}
+.row{display:flex;gap:10px}
+.hidden{display:none}
+.line{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px dashed #eee
+}
+.total{
+  font-size:20px;
+  font-weight:900;
+  text-align:right;
+  margin-top:10px;
+  color:#e11d48
+}
+.call{
+  background:#ff3b30
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="card">
+<div class="title">🚗 TÍNH GIÁ TAXI XANH SM</div>
+
+<label>Chọn loại xe</label>
+<select id="carType">
+  <option value="car">Xanh Car</option>
+  <option value="premium">Xanh Premium</option>
+  <option value="minio">Xanh Minio</option>
+</select>
+
+<label>Quãng đường (km)</label>
+<input id="km" type="number" value="10">
+
+<label>Thời gian chờ (phút)</label>
+<input id="wait" type="number" value="0">
+
+<label>
+<input type="checkbox" id="night"> Phụ phí ban đêm
+</label>
+
+<button onclick="calc()">TÍNH GIÁ</button>
+</div>
+
+<div class="card">
+<div class="title">📊 KẾT QUẢ</div>
+<div id="result" class="hidden">
+<div id="detail"></div>
+<div id="total" class="total"></div>
+</div>
+<div id="empty">Nhập dữ liệu để tính...</div>
+</div>
+
+<div class="row">
+<button class="call" onclick="callNow()">📞 GỌI NGAY</button>
+<button class="btn-green" onclick="zaloNow()">💬 ZALO</button>
+</div>
+
+</div>
+
+<script>
+// ===== BẢNG GIÁ =====
+const PRICE = {
+  car:{open:30500,p1:15300,p2:14000,p3:13000},
+  premium:{open:34400,p1:16800,p2:15400,p3:14300},
+  minio:{open:27500,p1:13200,p2:12400,p3:10700}
+};
+
+const WAIT_PRICE = 2000;
+const NIGHT_EXTRA = 0;
+
+// ===== TÍNH =====
+function calc(){
+  const km = parseFloat(document.getElementById('km').value)||0;
+  const wait = parseFloat(document.getElementById('wait').value)||0;
+  const night = document.getElementById('night').checked;
+  const type = document.getElementById('carType').value;
+
+  if(km<=0){
+    alert("Nhập km đi bro!");
+    return;
+  }
+
+  const p = PRICE[type];
+
+  let remain = Math.max(0, km-2);
+
+  const km1 = Math.min(10, remain); // 2-12
+  remain -= km1;
+
+  const km2 = Math.min(13, remain); // 12-25
+  remain -= km2;
+
+  const km3 = remain; // >25
+
+  const v_open = p.open;
+  const v1 = km1 * p.p1;
+  const v2 = km2 * p.p2;
+  const v3 = km3 * p.p3;
+
+  const waitCharge = wait>4 ? (wait-4)*WAIT_PRICE : 0;
+  const nightFee = night ? NIGHT_EXTRA : 0;
+
+  const total = v_open + v1 + v2 + v3 + waitCharge + nightFee;
+
+  // render
+  document.getElementById('empty').style.display='none';
+  document.getElementById('result').classList.remove('hidden');
+
+  const d = document.getElementById('detail');
+  d.innerHTML="";
+
+  function line(t,v){
+    d.innerHTML += `<div class="line"><span>${t}</span><span>${v.toLocaleString()} đ</span></div>`;
+  }
+
+  line("Mở cửa", v_open);
+  line("Km 2–12 ("+km1+" km)", v1);
+  line("Km 12–25 ("+km2+" km)", v2);
+  line("Km >25 ("+km3+" km)", v3);
+  line("Chờ ("+(wait>4?wait-4:0)+" phút)", waitCharge);
+  line("Phụ phí đêm", nightFee);
+
+  document.getElementById('total').innerText = "👉 Tổng: "+ total.toLocaleString() + " đ";
+}
+
+// ===== CALL =====
+function callNow(){
+  window.location.href = "tel:0900000000"; // đổi số
+}
+
+// ===== ZALO =====
+function zaloNow(){
+  window.location.href = "https://zalo.me/0900000000"; // đổi số
+}
+</script>
+
+</body>
+</html>
