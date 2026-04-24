@@ -2,44 +2,94 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tính giá taxi Xanh SM</title>
 
 <style>
 :root{
   --primary:#2d7df4;
   --accent:#00b14f;
-  --bg:#f5f7fa;
+  --bg:#f2f2f7;
 }
-body{font-family:system-ui;background:var(--bg);margin:0;padding:16px}
-.container{max-width:520px;margin:auto}
+body{
+  font-family:-apple-system, BlinkMacSystemFont, sans-serif;
+  background:var(--bg);
+  margin:0;
+  padding:12px;
+  -webkit-tap-highlight-color: transparent;
+}
+.container{
+  max-width:500px;
+  margin:auto;
+  padding-bottom:env(safe-area-inset-bottom);
+}
 .card{
-  background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.06)
+  background:#fff;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.05);
 }
 .title{font-weight:700;font-size:18px;margin-bottom:10px}
-label{font-weight:600;display:block;margin:6px 0}
+
+label{font-weight:600;margin:6px 0;display:block}
+
 input,select{
-  width:100%;padding:10px;border-radius:10px;
-  border:1px solid #e5e7eb;margin-bottom:10px;
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-size:16px; /* tránh zoom iOS */
+  margin-bottom:10px;
+  box-sizing:border-box;
 }
+
+input[type=checkbox]{
+  width:auto;
+  transform:scale(1.2);
+  margin-right:8px;
+}
+
 button{
-  width:100%;padding:12px;border:0;border-radius:10px;
-  font-weight:700;color:#fff;background:var(--primary);cursor:pointer;
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:700;
+  color:#fff;
+  background:var(--primary);
+  margin-top:6px;
 }
+
 .btn-green{background:var(--accent)}
+.call{background:#ff3b30}
+
 .row{display:flex;gap:10px}
 .hidden{display:none}
+
 .line{
-  display:flex;justify-content:space-between;
-  padding:6px 0;border-bottom:1px dashed #eee
+  display:flex;
+  justify-content:space-between;
+  padding:8px 0;
+  border-bottom:1px dashed #eee;
+  font-size:15px;
 }
+
 .total{
-  font-size:22px;font-weight:900;text-align:right;
-  margin-top:10px;color:#e11d48
+  font-size:22px;
+  font-weight:900;
+  text-align:right;
+  margin-top:10px;
+  color:#e11d48;
 }
-.call{background:#ff3b30}
-.note{color:#16a34a;font-weight:600;margin-top:8px}
+
+.note{
+  color:#16a34a;
+  font-weight:600;
+  margin-top:6px;
+  font-size:14px;
+}
 </style>
 </head>
 
@@ -47,26 +97,27 @@ button{
 <div class="container">
 
 <div class="card">
-<div class="title">🚗 TÍNH GIÁ TAXI XANH SM</div>
+<div class="title">🚗 TÍNH GIÁ TAXI</div>
 
-<label>Chọn loại xe</label>
+<label>Loại xe</label>
 <select id="carType">
   <option value="car">Xanh Car</option>
   <option value="premium">Xanh Premium</option>
   <option value="minio">Xanh Minio</option>
+  <option value="vf3">VF3 (rẻ hơn 10%)</option>
 </select>
 
-<label>Quãng đường đi (km)</label>
-<input id="km" type="number" value="10">
+<label>Quãng đường (km)</label>
+<input id="km" type="number" inputmode="decimal" placeholder="Nhập km">
 
-<label>
-<input type="checkbox" id="returnTrip"> Có khách chiều về (GIẢM 60%)
+<label style="display:flex;align-items:center">
+<input type="checkbox" id="returnTrip"> Có khách chiều về (giảm 60%)
 </label>
 
 <label>Thời gian chờ (phút)</label>
-<input id="wait" type="number" value="0">
+<input id="wait" type="number" inputmode="numeric" placeholder="Nhập phút">
 
-<label>
+<label style="display:flex;align-items:center">
 <input type="checkbox" id="night"> Phụ phí ban đêm
 </label>
 
@@ -84,39 +135,31 @@ button{
 </div>
 
 <div class="row">
-<button class="call" onclick="callNow()">📞 GỌI NGAY</button>
-<button class="btn-green" onclick="zaloNow()">💬 ZALO</button>
+<button class="call" onclick="callNow()">📞 Gọi</button>
+<button class="btn-green" onclick="zaloNow()">💬 Zalo</button>
 </div>
 
 </div>
 
 <script>
-// ===== BẢNG GIÁ =====
 const PRICE = {
   car:{open:30500,p1:15300,p2:14000,p3:13000},
   premium:{open:34400,p1:16800,p2:15400,p3:14300},
-  minio:{open:27500,p1:13200,p2:12400,p3:10700}
+  minio:{open:27500,p1:13200,p2:12400,p3:10700},
+  vf3:{open:24750,p1:11880,p2:11160,p3:9630}
 };
 
 const WAIT_PRICE = 1000;
-const NIGHT_EXTRA = 20000;
 
-// ===== TÍNH KM =====
 function calcDistanceCost(km, p){
   let remain = Math.max(0, km-2);
-
-  const km1 = Math.min(10, remain);
-  remain -= km1;
-
-  const km2 = Math.min(13, remain);
-  remain -= km2;
-
+  const km1 = Math.min(10, remain); remain -= km1;
+  const km2 = Math.min(13, remain); remain -= km2;
   const km3 = remain;
 
   return (km>0?p.open:0) + km1*p.p1 + km2*p.p2 + km3*p.p3;
 }
 
-// ===== MAIN =====
 function calc(){
   const km = parseFloat(document.getElementById('km').value)||0;
   const wait = parseFloat(document.getElementById('wait').value)||0;
@@ -124,32 +167,22 @@ function calc(){
   const returnTrip = document.getElementById('returnTrip').checked;
   const type = document.getElementById('carType').value;
 
-  if(km<=0){ alert("Nhập km!"); return; }
+  if(km<=0){ alert("Nhập km"); return; }
 
   const p = PRICE[type];
 
-  // chiều đi
-  const goCost = calcDistanceCost(km, p);
+  const go = calcDistanceCost(km, p);
 
-  // chiều về
-  let backFull = 0;
-  let backDiscount = 0;
-  let backFinal = 0;
-
+  let backFull=0, backDiscount=0, backFinal=0;
   if(returnTrip){
-    backFull = calcDistanceCost(km, p);   // giá gốc
-    backDiscount = backFull * 0.6;        // giảm 60%
-    backFinal = backFull * 0.4;           // còn 40%
+    backFull = calcDistanceCost(km, p);
+    backDiscount = backFull * 0.6;
+    backFinal = backFull * 0.4;
   }
 
   const waitCharge = wait>4 ? (wait-4)*WAIT_PRICE : 0;
-  const nightFee = night ? NIGHT_EXTRA : 0;
 
-  const total = goCost + backFinal + waitCharge + nightFee;
-
-  // render
-  document.getElementById('empty').style.display='none';
-  document.getElementById('result').classList.remove('hidden');
+  const total = go + backFinal + waitCharge;
 
   const d = document.getElementById('detail');
   d.innerHTML="";
@@ -158,36 +191,27 @@ function calc(){
     d.innerHTML += `<div class="line"><span>${t}</span><span>${v.toLocaleString()} đ</span></div>`;
   }
 
-  line("🚗 Chiều đi", goCost);
+  line("🚗 Chiều đi", go);
 
   if(returnTrip){
     line("🔁 Giá gốc chiều về", backFull);
     line("💸 Giảm 60%", -backDiscount);
-    line("👉 Khách trả chiều về", backFinal);
+    line("👉 Trả chiều về", backFinal);
   }
 
-  line("⏱ Chờ ("+(wait>4?wait-4:0)+" phút)", waitCharge);
-  line("🌙 Phụ phí đêm", nightFee);
+  line("⏱ Chờ", waitCharge);
 
-  document.getElementById('total').innerText =
-    "👉 Tổng tiền: "+ total.toLocaleString() + " đ";
-
-  if(returnTrip){
-    document.getElementById('saving').innerText =
-      "💰 Khách tiết kiệm: " + backDiscount.toLocaleString() + " đ";
-  } else {
-    document.getElementById('saving').innerText = "";
-  }
+  document.getElementById('result').classList.remove('hidden');
+  document.getElementById('empty').style.display='none';
+  document.getElementById('total').innerText = "👉 "+ total.toLocaleString()+" đ";
 }
 
-// ===== CALL =====
 function callNow(){
-  window.location.href = "tel:0935183343";
+  window.location.href = "tel:0900000000";
 }
 
-// ===== ZALO =====
 function zaloNow(){
-  window.location.href = "https://zalo.me/0935183343";
+  window.location.href = "https://zalo.me/0900000000";
 }
 </script>
 
