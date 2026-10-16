@@ -4,100 +4,114 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tính cước taxi Minh Công</title>
+  <title>Minh Công GSM - Tính cước</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 16px;
-      background: #f2f5f8;
-      font-family: Arial, sans-serif;
+      padding: 14px;
+      background: #f2f4f6;
       color: #222;
+      font-family: Arial, sans-serif;
     }
 
     .container {
       max-width: 760px;
-      margin: 0 auto;
+      margin: auto;
     }
 
     h1 {
-      margin: 0 0 8px;
+      margin: 4px 0 6px;
       color: #087443;
       font-size: 25px;
       text-align: center;
     }
 
     .subtitle {
-      margin: 0 0 20px;
+      margin: 0 0 18px;
       color: #666;
       text-align: center;
       font-size: 14px;
     }
 
     .panel {
-      padding: 18px;
-      margin-bottom: 16px;
-      background: white;
-      border-radius: 14px;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+      padding: 17px;
+      margin-bottom: 15px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0000000b;
+    }
+
+    .panel-title {
+      margin: 0 0 15px;
+      color: #087443;
+      font-size: 18px;
     }
 
     label {
       display: block;
-      margin: 12px 0 6px;
-      font-weight: bold;
+      margin: 13px 0 6px;
       font-size: 14px;
+      font-weight: bold;
     }
 
-    input[type="number"],
-    input[type="tel"],
-    select {
+    input[type="number"], select {
       width: 100%;
-      padding: 12px;
-      border: 1px solid #ccd3da;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid #ccd2d8;
       border-radius: 8px;
       background: white;
       font-size: 16px;
     }
 
-    input[type="checkbox"] {
-      width: 19px;
-      height: 19px;
-      margin: 0 8px 0 0;
-      vertical-align: middle;
-    }
-
-    .checkbox-line {
+    .check-row {
       display: flex;
       align-items: center;
+      gap: 8px;
       margin-top: 16px;
-      font-weight: bold;
+    }
+
+    .check-row input {
+      width: 19px;
+      height: 19px;
+      flex-shrink: 0;
+    }
+
+    .check-row label {
+      margin: 0;
       line-height: 1.5;
     }
 
-    .checkbox-line label {
-      margin: 0;
-      font-size: 15px;
-    }
-
     .hint {
-      margin-top: 7px;
+      margin-top: 8px;
       color: #666;
       font-size: 13px;
       line-height: 1.5;
     }
 
-    .price-title {
-      margin: 0 0 12px;
-      font-size: 18px;
-      color: #087443;
+    .hidden { display: none !important; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      min-height: 46px;
+      margin-top: 13px;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
     }
+
+    .btn-primary { background: #087443; color: white; }
+    .btn-blue { background: #1769c2; color: white; }
+    .btn-light { background: #edf6f0; color: #087443; }
 
     .price-table {
       width: 100%;
@@ -105,150 +119,111 @@
       font-size: 14px;
     }
 
-    .price-table th,
-    .price-table td {
-      padding: 10px 7px;
-      border-bottom: 1px solid #e8ecef;
+    .price-table th, .price-table td {
+      padding: 10px 6px;
+      border-bottom: 1px solid #e7eaed;
       text-align: left;
     }
 
     .price-table th {
-      background: #f3f8f5;
-      color: #333;
+      background: #f1f7f3;
     }
 
-    .price-table td:last-child,
-    .price-table th:last-child {
+    .price-table th:last-child,
+    .price-table td:last-child {
       text-align: right;
       white-space: nowrap;
     }
 
-    .price-table tr:last-child td {
-      border-bottom: none;
+    /* Kết quả gửi khách */
+    #resultCapture {
+      padding: 18px;
+      background: #fff;
+      border: 1px solid #e1e5e8;
+      border-radius: 10px;
     }
 
-    .button {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      margin-top: 14px;
-      border: none;
-      border-radius: 9px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .btn-calculate {
-      background: #087443;
-      color: white;
-    }
-
-    .btn-capture {
-      background: #1668c5;
-      color: white;
-    }
-
-    .btn-call {
-      background: #eaf6ee;
-      color: #087443;
-    }
-
-    .btn-zalo {
-      background: #eaf2ff;
-      color: #1264bb;
-    }
-
-    .result-card {
-      padding: 20px;
-      background: white;
-      border: 1px solid #dce6df;
-      border-radius: 14px;
-    }
-
-    .result-header {
+    .receipt-header {
       padding-bottom: 15px;
       border-bottom: 2px solid #087443;
     }
 
-    .result-brand {
+    .brand {
       color: #087443;
       font-size: 13px;
       font-weight: bold;
-      letter-spacing: 1px;
+      letter-spacing: 0.7px;
     }
 
-    .result-heading {
-      margin-top: 6px;
-      font-size: 23px;
+    .receipt-title {
+      margin-top: 7px;
+      font-size: 22px;
       font-weight: bold;
     }
 
-    .car-code {
+    .car-badge {
       display: inline-block;
       margin-top: 10px;
-      padding: 7px 12px;
-      border-radius: 7px;
+      padding: 6px 11px;
+      border-radius: 5px;
       background: #087443;
       color: white;
+      font-size: 14px;
       font-weight: bold;
-      font-size: 15px;
     }
 
-    .result-summary {
-      margin: 15px 0;
-      padding: 12px;
-      border-radius: 9px;
-      background: #f2f8f4;
+    .trip-info {
+      margin: 13px 0;
+      padding: 11px;
+      border-radius: 7px;
+      background: #f4f7f5;
+      font-size: 14px;
       line-height: 1.8;
-      font-size: 14px;
     }
 
-    .section-heading {
-      margin: 20px 0 10px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #087443;
-    }
-
-    .formula-list {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .formula-list li {
-      padding: 10px 0;
-      border-bottom: 1px dashed #dce2e7;
-      font-size: 14px;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-    }
-
-    .formula-list li:last-child {
-      border-bottom: none;
-    }
-
-    .formula-label {
+    .detail-heading {
+      margin: 18px 0 5px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid #e3e7e9;
+      font-size: 15px;
       font-weight: bold;
     }
 
-    .formula-value {
-      float: right;
-      margin-left: 8px;
+    .fare-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid #edf0f2;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .fare-row .fare-name {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .fare-row .fare-amount {
       font-weight: bold;
       text-align: right;
+      white-space: nowrap;
     }
 
-    .formula-detail {
-      color: #666;
-      font-size: 13px;
+    .fare-note {
+      margin-top: 3px;
+      color: #6b7176;
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.5;
     }
+
+    .discount { color: #168247; }
 
     .total-box {
       margin-top: 18px;
-      padding: 18px 12px;
-      border-radius: 10px;
+      padding: 16px 10px;
+      border-radius: 9px;
       background: #087443;
       color: white;
       text-align: center;
@@ -261,53 +236,28 @@
 
     .total-amount {
       margin-top: 8px;
-      font-size: 30px;
+      font-size: 29px;
       font-weight: bold;
       overflow-wrap: anywhere;
     }
 
-    .saving {
-      margin-top: 12px;
-      color: #087443;
-      font-size: 14px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .result-footer {
-      margin-top: 20px;
+    .receipt-footer {
+      margin-top: 17px;
       padding-top: 12px;
-      border-top: 1px solid #e5e9ec;
+      border-top: 1px solid #e5e8ea;
       color: #666;
       text-align: center;
       font-size: 12px;
       line-height: 1.7;
     }
 
-    .hidden {
-      display: none;
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 10px;
-      }
-
-      .panel {
-        padding: 14px;
-      }
-
-      .result-card {
-        padding: 14px;
-      }
-
-      .total-amount {
-        font-size: 26px;
-      }
-
-      .price-table {
-        font-size: 13px;
-      }
+    @media (max-width: 420px) {
+      body { padding: 9px; }
+      .panel { padding: 13px; }
+      #resultCapture { padding: 13px; }
+      .receipt-title { font-size: 19px; }
+      .total-amount { font-size: 25px; }
+      .fare-row { font-size: 13px; }
     }
   </style>
 </head>
@@ -316,12 +266,12 @@
 <div class="container">
 
   <h1>MINH CÔNG GSM</h1>
-  <p class="subtitle">Tính cước chuyến đi nhanh chóng, rõ ràng</p>
+  <p class="subtitle">Tính cước chuyến đi minh bạch, rõ ràng</p>
 
-  <div class="panel">
-    <h2 class="price-title">1. Thông tin chuyến đi</h2>
+  <section class="panel">
+    <h2 class="panel-title">Thông tin chuyến đi</h2>
 
-    <label for="carType">Chọn loại xe</label>
+    <label for="carType">Loại xe</label>
     <select id="carType" onchange="updatePriceTable()">
       <option value="vf3">Xanh VF3</option>
       <option value="minio">Xanh Minio</option>
@@ -330,35 +280,39 @@
     </select>
 
     <label for="distance">Quãng đường một chiều (km)</label>
-    <input id="distance" type="number" min="0" step="0.1"
+    <input id="distance" type="number" min="0.1" step="0.1"
            placeholder="Ví dụ: 35">
 
     <label for="waitMinutes">Thời gian chờ (phút)</label>
     <input id="waitMinutes" type="number" min="0" step="1" value="0">
 
-    <div class="checkbox-line">
+    <label for="tollFee">Phí qua trạm thu phí (VNĐ)</label>
+    <input id="tollFee" type="number" min="0" step="1000" value="0"
+           placeholder="Nhập tổng phí qua trạm">
+
+    <div class="check-row">
       <input id="returnTrip" type="checkbox" onchange="updateReturnNote()">
       <label for="returnTrip">Có khách chiều về</label>
     </div>
 
     <div id="returnNote" class="hint hidden">
-      Khi chọn mục này, toàn bộ quãng đường chiều đi được tính theo đơn giá
-      từ km thứ 26 trở đi. Chiều về được giảm 60%, khách trả 40%.
-      Không tính giá mở cửa 2 km đầu.
+      Dưới 30 km: tính giá bình thường cho cả hai chiều, chiều về giảm 60%.
+      Từ 30 km trở lên: cả chiều đi và chiều về tính theo đơn giá từ km 26,
+      chiều về giảm 60%.
     </div>
 
-    <div class="checkbox-line">
+    <div class="check-row">
       <input id="nightFee" type="checkbox">
       <label for="nightFee">Có phụ phí ban đêm (+20.000đ)</label>
     </div>
 
-    <button class="button btn-calculate" onclick="calculateFare()">
+    <button class="btn btn-primary" onclick="calculateFare()">
       TÍNH CƯỚC
     </button>
-  </div>
+  </section>
 
-  <div class="panel">
-    <h2 class="price-title">2. Bảng giá loại xe đang chọn</h2>
+  <section class="panel">
+    <h2 class="panel-title">Bảng giá loại xe</h2>
 
     <table class="price-table">
       <thead>
@@ -371,52 +325,41 @@
     </table>
 
     <p class="hint">
-      Giá mở cửa áp dụng cho 2 km đầu. 10 km tiếp theo áp dụng đơn giá
-      km 3–12; 13 km tiếp theo áp dụng đơn giá km 13–25;
-      từ km 26 trở đi áp dụng đơn giá p3.
+      Giá mở cửa áp dụng cho 2 km đầu. Km 3–12 áp dụng p1;
+      km 13–25 áp dụng p2; từ km 26 trở đi áp dụng p3.
     </p>
-  </div>
+  </section>
 
-  <div id="resultSection" class="panel hidden">
-    <h2 class="price-title">3. Kết quả tính cước</h2>
+  <section id="resultSection" class="panel hidden">
+    <h2 class="panel-title">Chi tiết cước chuyến đi</h2>
 
-    <div id="resultCapture" class="result-card">
-      <div class="result-header">
-        <div class="result-brand">MINH CÔNG GSM</div>
-        <div class="result-heading">CHI TIẾT CƯỚC CHUYẾN ĐI</div>
-        <div id="resultCarCode" class="car-code">VF3</div>
+    <div id="resultCapture">
+      <div class="receipt-header">
+        <div class="brand">MINH CÔNG GSM</div>
+        <div class="receipt-title">CHI TIẾT CƯỚC CHUYẾN ĐI</div>
+        <div id="resultCarCode" class="car-badge">XANH VF3</div>
       </div>
 
-      <div id="resultSummary" class="result-summary"></div>
+      <div id="tripInfo" class="trip-info"></div>
 
-      <div class="section-heading">Chi tiết cách tính</div>
-      <ul id="formulaList" class="formula-list"></ul>
+      <div class="detail-heading">Chi tiết cách tính cước</div>
+      <div id="fareDetails"></div>
 
       <div class="total-box">
         <div class="total-label">TỔNG TIỀN KHÁCH TRẢ</div>
         <div id="total" class="total-amount">0 đ</div>
       </div>
 
-      <div id="saving" class="saving"></div>
-
-      <div class="result-footer">
+      <div class="receipt-footer">
         MINH CÔNG GSM — Hành trình xanh, dịch vụ tận tâm<br>
-        Đi gần, đi xa, đi tỉnh — rõ ràng chi phí trước chuyến đi
+        Cảm ơn quý khách đã sử dụng dịch vụ!
       </div>
     </div>
 
-    <button class="button btn-capture" onclick="captureResult()">
+    <button class="btn btn-blue" onclick="captureResult()">
       CHỤP ẢNH KẾT QUẢ
     </button>
-
-    <button class="button btn-call" onclick="callNow()">
-      GỌI ĐIỆN: 0935 183 343
-    </button>
-
-    <button class="button btn-zalo" onclick="zaloNow()">
-      LIÊN HỆ QUA ZALO
-    </button>
-  </div>
+  </section>
 </div>
 
 <script>
@@ -429,7 +372,6 @@
       p2: 14000,
       p3: 13000
     },
-
     premium: {
       name: "Xanh Premium",
       short: "PREMIUM",
@@ -438,7 +380,6 @@
       p2: 15400,
       p3: 14300
     },
-
     minio: {
       name: "Xanh Minio",
       short: "MINIO",
@@ -447,7 +388,6 @@
       p2: 12400,
       p3: 10700
     },
-
     vf3: {
       name: "Xanh VF3",
       short: "VF3",
@@ -463,207 +403,160 @@
   const NIGHT_FEE = 20000;
   const RETURN_DISCOUNT = 0.60;
 
-  let lastCalculation = null;
-
-  // Định dạng tiền VNĐ, không làm tròn lên hàng nghìn.
-  function formatMoney(value) {
+  function money(value) {
+    // Không làm tròn lên hàng nghìn.
+    // Hiển thị chính xác đến đồng; giữ phần thập phân nếu có.
     return Number(value).toLocaleString("vi-VN", {
       maximumFractionDigits: 2
     }) + " đ";
   }
 
-  function formatKm(value) {
+  function kmText(value) {
     return Number(value).toLocaleString("vi-VN", {
       maximumFractionDigits: 2
     }) + " km";
   }
 
-  function getSelectedPrice() {
+  function selectedPrice() {
     return PRICE[document.getElementById("carType").value];
   }
 
   function updatePriceTable() {
-    const p = getSelectedPrice();
+    const p = selectedPrice();
 
     document.getElementById("priceTableBody").innerHTML = `
       <tr>
         <td>Giá mở cửa (2 km đầu)</td>
-        <td>${formatMoney(p.open)}</td>
+        <td>${money(p.open)}</td>
       </tr>
       <tr>
-        <td>Km 3–12 (10 km tiếp theo)</td>
-        <td>${formatMoney(p.p1)}/km</td>
+        <td>Km 3–12</td>
+        <td>${money(p.p1)}/km</td>
       </tr>
       <tr>
-        <td>Km 13–25 (13 km tiếp theo)</td>
-        <td>${formatMoney(p.p2)}/km</td>
+        <td>Km 13–25</td>
+        <td>${money(p.p2)}/km</td>
       </tr>
       <tr>
         <td>Từ km 26 trở đi</td>
-        <td>${formatMoney(p.p3)}/km</td>
+        <td>${money(p.p3)}/km</td>
       </tr>
     `;
 
-    // Nếu đã có kết quả thì xóa kết quả cũ khi đổi loại xe.
-    lastCalculation = null;
     document.getElementById("resultSection").classList.add("hidden");
   }
 
   function updateReturnNote() {
-    const checked = document.getElementById("returnTrip").checked;
-    document.getElementById("returnNote").classList.toggle("hidden", !checked);
+    document.getElementById("returnNote").classList.toggle(
+      "hidden",
+      !document.getElementById("returnTrip").checked
+    );
 
-    lastCalculation = null;
     document.getElementById("resultSection").classList.add("hidden");
   }
 
-  // Tính cước bình thường theo các mốc.
-  // Nếu useLongTripRate=true, toàn bộ km dùng p3, bỏ giá mở cửa.
-  function calcDistanceCost(km, p, useLongTripRate = false) {
+  // Giá mở cửa là tổng giá của 2 km đầu.
+  // useP3=true: toàn bộ km tính theo đơn giá từ km 26.
+  function calcFare(km, p, useP3 = false) {
     if (km <= 0) return 0;
 
-    if (useLongTripRate) {
+    if (useP3) {
       return km * p.p3;
     }
 
-    let cost = 0;
+    const openKm = Math.min(km, 2);
+    const p1Km = Math.min(Math.max(km - 2, 0), 10);
+    const p2Km = Math.min(Math.max(km - 12, 0), 13);
+    const p3Km = Math.max(km - 25, 0);
 
-    // 2 km đầu: giá mở cửa.
-    const firstKm = Math.min(km, 2);
-    cost += firstKm * (p.open / 2);
-
-    // Km 3–12: tối đa 10 km.
-    const kmP1 = Math.min(Math.max(km - 2, 0), 10);
-    cost += kmP1 * p.p1;
-
-    // Km 13–25: tối đa 13 km.
-    const kmP2 = Math.min(Math.max(km - 12, 0), 13);
-    cost += kmP2 * p.p2;
-
-    // Từ km 26 trở đi.
-    const kmP3 = Math.max(km - 25, 0);
-    cost += kmP3 * p.p3;
-
-    return cost;
+    return (openKm * p.open / 2)
+      + (p1Km * p.p1)
+      + (p2Km * p.p2)
+      + (p3Km * p.p3);
   }
 
-  function addFormula(label, value, detail = "") {
-    const li = document.createElement("li");
+  function addFareRow(title, amount, note = "", options = {}) {
+    const row = document.createElement("div");
+    row.className = "fare-row";
 
-    const labelDiv = document.createElement("div");
-    labelDiv.className = "formula-label";
-    labelDiv.textContent = label;
+    const name = document.createElement("div");
+    name.className = "fare-name";
+    name.textContent = title;
 
-    const valueDiv = document.createElement("div");
-    valueDiv.className = "formula-value";
-    valueDiv.textContent = formatMoney(value);
-
-    li.appendChild(labelDiv);
-    li.appendChild(valueDiv);
-
-    if (detail) {
-      const detailDiv = document.createElement("div");
-      detailDiv.className = "formula-detail";
-      detailDiv.textContent = detail;
-      li.appendChild(detailDiv);
+    if (note) {
+      const detail = document.createElement("div");
+      detail.className = "fare-note";
+      detail.textContent = note;
+      name.appendChild(detail);
     }
 
-    document.getElementById("formulaList").appendChild(li);
+    const value = document.createElement("div");
+    value.className = "fare-amount";
+    if (options.discount) value.classList.add("discount");
+    value.textContent = (options.negative && amount > 0 ? "−" : "")
+      + money(Math.abs(amount));
+
+    row.appendChild(name);
+    row.appendChild(value);
+
+    document.getElementById("fareDetails").appendChild(row);
   }
 
-  function renderNormalTripFormula(km, p, total) {
-    const list = document.getElementById("formulaList");
-    list.innerHTML = "";
+  function addNormalFareBreakdown(prefix, km, p) {
+    const openKm = Math.min(km, 2);
+    const p1Km = Math.min(Math.max(km - 2, 0), 10);
+    const p2Km = Math.min(Math.max(km - 12, 0), 13);
+    const p3Km = Math.max(km - 25, 0);
 
-    let remaining = km;
+    const total = calcFare(km, p, false);
 
-    const kmOpen = Math.min(remaining, 2);
-    remaining -= kmOpen;
-
-    const kmP1 = Math.min(remaining, 10);
-    remaining -= kmP1;
-
-    const kmP2 = Math.min(remaining, 13);
-    remaining -= kmP2;
-
-    const kmP3 = Math.max(remaining, 0);
-
-    if (kmOpen > 0) {
-      const amount = kmOpen * (p.open / 2);
-      addFormula(
-        "Chiều đi — giá mở cửa",
-        amount,
-        `${formatKm(kmOpen)} × ${formatMoney(p.open / 2)}/km`
+    if (openKm > 0) {
+      addFareRow(
+        prefix + " — giá mở cửa",
+        openKm * p.open / 2,
+        `${kmText(openKm)} × ${money(p.open / 2)}/km`
       );
     }
 
-    if (kmP1 > 0) {
-      const amount = kmP1 * p.p1;
-      addFormula(
-        "Chiều đi — km 3 đến km 12",
-        amount,
-        `${formatKm(kmP1)} × ${formatMoney(p.p1)}/km`
+    if (p1Km > 0) {
+      addFareRow(
+        prefix + " — km 3 đến km 12",
+        p1Km * p.p1,
+        `${kmText(p1Km)} × ${money(p.p1)}/km`
       );
     }
 
-    if (kmP2 > 0) {
-      const amount = kmP2 * p.p2;
-      addFormula(
-        "Chiều đi — km 13 đến km 25",
-        amount,
-        `${formatKm(kmP2)} × ${formatMoney(p.p2)}/km`
+    if (p2Km > 0) {
+      addFareRow(
+        prefix + " — km 13 đến km 25",
+        p2Km * p.p2,
+        `${kmText(p2Km)} × ${money(p.p2)}/km`
       );
     }
 
-    if (kmP3 > 0) {
-      const amount = kmP3 * p.p3;
-      addFormula(
-        "Chiều đi — từ km 26 trở đi",
-        amount,
-        `${formatKm(kmP3)} × ${formatMoney(p.p3)}/km`
+    if (p3Km > 0) {
+      addFareRow(
+        prefix + " — từ km 26 trở đi",
+        p3Km * p.p3,
+        `${kmText(p3Km)} × ${money(p.p3)}/km`
       );
     }
 
-    addFormula("Tổng cước chiều đi", total);
-  }
-
-  function renderReturnTripFormula(km, p, go, backBeforeDiscount,
-                                  backFinal) {
-    const list = document.getElementById("formulaList");
-    list.innerHTML = "";
-
-    addFormula(
-      "Chiều đi — bỏ giá mở cửa",
-      go,
-      `${formatKm(km)} × ${formatMoney(p.p3)}/km`
-    );
-
-    addFormula(
-      "Chiều về — cước trước giảm",
-      backBeforeDiscount,
-      `${formatKm(km)} × ${formatMoney(p.p3)}/km`
-    );
-
-    const discount = backBeforeDiscount * RETURN_DISCOUNT;
-
-    addFormula(
-      "Chiều về — giảm 60%",
-      -discount,
-      "Mức giảm 60% cước chiều về"
-    );
-
-    addFormula(
-      "Chiều về — khách trả 40%",
-      backFinal,
-      `${formatMoney(backBeforeDiscount)} × 40%`
-    );
+    addFareRow("Tổng cước " + prefix.toLowerCase(), total);
+    return total;
   }
 
   function calculateFare() {
     const km = Number(document.getElementById("distance").value);
-    const waitMinutes = Number(document.getElementById("waitMinutes").value || 0);
-    const returnTrip = document.getElementById("returnTrip").checked;
-    const nightFee = document.getElementById("nightFee").checked;
+    const waitMinutes = Number(
+      document.getElementById("waitMinutes").value || 0
+    );
+    const tollFee = Number(
+      document.getElementById("tollFee").value || 0
+    );
+
+    const hasReturn = document.getElementById("returnTrip").checked;
+    const hasNightFee = document.getElementById("nightFee").checked;
 
     if (!Number.isFinite(km) || km <= 0) {
       alert("Vui lòng nhập quãng đường lớn hơn 0 km.");
@@ -675,83 +568,126 @@
       return;
     }
 
-    const p = getSelectedPrice();
+    if (!Number.isFinite(tollFee) || tollFee < 0) {
+      alert("Vui lòng nhập phí qua trạm hợp lệ.");
+      return;
+    }
 
-    let go = 0;
-    let backBeforeDiscount = 0;
-    let backFinal = 0;
-    let backDiscount = 0;
+    const p = selectedPrice();
+    const longTrip = hasReturn && km >= 30;
 
-    if (returnTrip) {
-      // Có khách chiều về: toàn bộ chiều đi tính giá p3.
-      go = calcDistanceCost(km, p, true);
+    let goFare;
+    let returnBeforeDiscount = 0;
+    let returnDiscount = 0;
+    let returnPayable = 0;
 
-      // Chiều về cũng tính theo giá p3, sau đó khách trả 40%.
-      backBeforeDiscount = km * p.p3;
-      backDiscount = backBeforeDiscount * RETURN_DISCOUNT;
-      backFinal = backBeforeDiscount - backDiscount;
+    // Chiều đi:
+    // Từ 30 km trở lên và có khách chiều về: toàn bộ km dùng p3.
+    // Các trường hợp còn lại: tính theo mốc giá bình thường.
+    if (longTrip) {
+      goFare = calcFare(km, p, true);
     } else {
-      // Không có khách chiều về: tính theo các mốc bình thường.
-      go = calcDistanceCost(km, p, false);
+      goFare = calcFare(km, p, false);
+    }
+
+    // Chiều về:
+    // Từ 30 km trở lên: tính toàn bộ km theo p3.
+    // Dưới 30 km: tính theo mốc giá bình thường.
+    // Sau đó giảm 60%, khách trả 40%.
+    if (hasReturn) {
+      returnBeforeDiscount = longTrip
+        ? calcFare(km, p, true)
+        : calcFare(km, p, false);
+
+      returnDiscount = returnBeforeDiscount * RETURN_DISCOUNT;
+      returnPayable = returnBeforeDiscount - returnDiscount;
     }
 
     const chargeableWait = Math.max(waitMinutes - FREE_WAIT, 0);
-    const waitCharge = chargeableWait * WAIT_PRICE;
-    const extraNight = nightFee ? NIGHT_FEE : 0;
+    const waitFee = chargeableWait * WAIT_PRICE;
+    const nightFee = hasNightFee ? NIGHT_FEE : 0;
 
-    const total = go + backFinal + waitCharge + extraNight;
+    const total = goFare
+      + returnPayable
+      + waitFee
+      + tollFee
+      + nightFee;
 
+    // Thông tin đầu phiếu: chỉ hiển thị loại xe một lần.
     document.getElementById("resultCarCode").textContent =
-      "LOẠI XE: " + p.short;
+      p.name + " (" + p.short + ")";
 
-    document.getElementById("resultSummary").innerHTML = `
-      <div><strong>Loại xe:</strong> ${p.name} (${p.short})</div>
-      <div><strong>Quãng đường một chiều:</strong> ${formatKm(km)}</div>
-      <div><strong>Chiều về:</strong> ${returnTrip ? "Có khách, giảm 60%" : "Không tính"}</div>
+    document.getElementById("tripInfo").innerHTML = `
+      <div><strong>Quãng đường:</strong> ${kmText(km)} một chiều</div>
+      <div><strong>Khách chiều về:</strong> ${hasReturn ? "Có" : "Không"}</div>
       <div><strong>Thời gian chờ:</strong> ${waitMinutes} phút</div>
     `;
 
-    if (returnTrip) {
-      renderReturnTripFormula(
-        km, p, go, backBeforeDiscount, backFinal
+    const details = document.getElementById("fareDetails");
+    details.innerHTML = "";
+
+    // Chi tiết chiều đi.
+    if (longTrip) {
+      addFareRow(
+        "Cước chiều đi — đơn giá từ km 26",
+        goFare,
+        `${kmText(km)} × ${money(p.p3)}/km`
       );
     } else {
-      renderNormalTripFormula(km, p, go);
+      addNormalFareBreakdown("Chiều đi", km, p);
     }
 
-    if (waitMinutes > 0) {
-      addFormula(
-        "Phí chờ",
-        waitCharge,
-        `${Math.min(waitMinutes, FREE_WAIT)} phút đầu miễn phí; ` +
-        `${chargeableWait} phút tính phí × ${formatMoney(WAIT_PRICE)}/phút`
+    // Chi tiết chiều về.
+    if (hasReturn) {
+      if (longTrip) {
+        addFareRow(
+          "Cước chiều về — đơn giá từ km 26",
+          returnBeforeDiscount,
+          `${kmText(km)} × ${money(p.p3)}/km`
+        );
+      } else {
+        addNormalFareBreakdown("Chiều về trước giảm", km, p);
+      }
+
+      addFareRow(
+        "Giảm giá chiều về (60%)",
+        returnDiscount,
+        "Chiết khấu trên cước chiều về",
+        { discount: true, negative: true }
+      );
+
+      addFareRow(
+        "Khách trả cước chiều về (40%)",
+        returnPayable
       );
     }
 
-    if (nightFee) {
-      addFormula("Phụ phí ban đêm", extraNight);
+    // Phí chờ.
+    if (waitMinutes > 0) {
+      addFareRow(
+        "Phí chờ",
+        waitFee,
+        `${FREE_WAIT} phút đầu miễn phí; ${chargeableWait} phút tính phí × `
+        + `${money(WAIT_PRICE)}/phút`
+      );
     }
 
-    document.getElementById("total").textContent = formatMoney(total);
+    // Phí qua trạm.
+    if (tollFee > 0) {
+      addFareRow(
+        "Phí qua trạm thu phí",
+        tollFee,
+        "Cộng theo số tiền phí trạm đã nhập"
+      );
+    }
 
-    document.getElementById("saving").textContent = returnTrip
-      ? "Tiết kiệm chiều về: " + formatMoney(backDiscount)
-      : "";
+    // Phụ phí ban đêm.
+    if (hasNightFee) {
+      addFareRow("Phụ phí ban đêm", nightFee);
+    }
 
+    document.getElementById("total").textContent = money(total);
     document.getElementById("resultSection").classList.remove("hidden");
-
-    lastCalculation = {
-      km,
-      p,
-      returnTrip,
-      go,
-      backBeforeDiscount,
-      backFinal,
-      backDiscount,
-      waitCharge,
-      extraNight,
-      total
-    };
 
     document.getElementById("resultSection").scrollIntoView({
       behavior: "smooth",
@@ -762,13 +698,13 @@
   async function captureResult() {
     const result = document.getElementById("resultCapture");
 
-    if (result.classList.contains("hidden")) {
+    if (document.getElementById("resultSection").classList.contains("hidden")) {
       alert("Vui lòng tính cước trước khi chụp ảnh.");
       return;
     }
 
     if (typeof html2canvas === "undefined") {
-      alert("Không tải được công cụ chụp ảnh. Vui lòng kiểm tra kết nối mạng.");
+      alert("Không tải được công cụ chụp ảnh. Hãy kiểm tra kết nối mạng.");
       return;
     }
 
@@ -817,15 +753,6 @@
     }
   }
 
-  function callNow() {
-    window.location.href = "tel:0935183343";
-  }
-
-  function zaloNow() {
-    window.open("https://zalo.me/0935183343", "_blank");
-  }
-
-  // Hiển thị bảng giá ban đầu.
   updatePriceTable();
 </script>
 </body>
